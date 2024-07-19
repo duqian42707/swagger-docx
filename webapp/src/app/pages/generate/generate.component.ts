@@ -5,6 +5,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {NzUploadFile} from "ng-zorro-antd/upload";
 import {filter} from "rxjs";
 import {environment} from "../../../environments/environment";
+import {NzMessageService} from "ng-zorro-antd/message";
 
 @Component({
   selector: 'app-generate',
@@ -19,7 +20,7 @@ export class GenerateComponent implements OnInit {
   validateForm: FormGroup;
 
 
-  constructor(private http: HttpClient, private fb: FormBuilder) {
+  constructor(private http: HttpClient, private fb: FormBuilder, private msg: NzMessageService) {
     this.validateForm = this.fb.group({
       title: ['数据库表结构文档',],
       description: ['数据库表结构文档',],
@@ -49,6 +50,14 @@ export class GenerateComponent implements OnInit {
     const config = this.validateForm.getRawValue();
     const data = new FormData();
     data.append('json', JSON.stringify(config))
+    if (this.swaggerFileList.length == 0) {
+      this.msg.warning('请上传Swagger Json文件！');
+      return;
+    }
+    if (this.templateFileList.length == 0) {
+      this.msg.warning('请上传word模板文件！');
+      return;
+    }
     for (const file of this.swaggerFileList) {
       data.append('swaggerFiles', file as any);
     }

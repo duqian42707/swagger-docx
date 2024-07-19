@@ -9,14 +9,10 @@ import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
 import com.dqv5.swagger.docx.pojo.*;
 import com.dqv5.swagger.docx.service.DocumentService;
-import com.dqv5.swagger.docx.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.xmlgraphics.util.ClasspathResource;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -64,20 +60,11 @@ public class DocumentServiceImpl implements DocumentService {
             }
             model.setRequestInfos(requestInfos);
 
-
-            InputStream templateInputStream = null;
-            if (template != null) {
-                templateInputStream = template.getInputStream();
-            } else {
-                String fileName = "default-template.docx";
-                ClassPathResource classPathResource = new ClassPathResource("files/" + fileName);
-                templateInputStream = classPathResource.getInputStream();
-            }
-
             //执行生成
             LoopRowTableRenderPolicy policy = new LoopRowTableRenderPolicy();
-            Configure configure = Configure.builder().bind("requestInfos", policy).bind("tables", policy)
+            Configure configure = Configure.builder().bind("requestInfos", policy).bind("parameters", policy)
                     .useSpringEL().build();
+            InputStream templateInputStream = template.getInputStream();
             XWPFTemplate xwpfTemplate = XWPFTemplate.compile(templateInputStream, configure);
 
             File file = new File(folderPath, "output.docx");
@@ -129,7 +116,9 @@ public class DocumentServiceImpl implements DocumentService {
                 info.setRequestMethod(method);
                 JSONObject paramInfo = infoJson.getJSONObject(method);
                 String summary = paramInfo.getString("summary");
-                info.setDescription(summary);
+                String description = paramInfo.getString("description");
+                info.setSummary(summary);
+                info.setDescription(description);
                 JSONArray parameterArr = paramInfo.getJSONArray("parameters");
                 List<RequestParamVo> parameters = new ArrayList<>();
                 if (!CollectionUtils.isEmpty(parameterArr)) {

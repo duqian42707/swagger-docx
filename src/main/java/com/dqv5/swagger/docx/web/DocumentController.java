@@ -1,5 +1,6 @@
 package com.dqv5.swagger.docx.web;
 
+import cn.hutool.core.util.ZipUtil;
 import com.dqv5.swagger.docx.pojo.DbdocConfigDTO;
 import com.dqv5.swagger.docx.pojo.GenerateResult;
 import com.dqv5.swagger.docx.service.DocumentService;
@@ -35,28 +36,30 @@ public class DocumentController {
     private DocumentService documentService;
 
     @GetMapping("/download-templates")
-    public ResponseEntity<InputStreamResource> downloadTemplates(HttpServletResponse response) throws IOException {
-        String fileName = "default-template.docx";
-        ClassPathResource classPathResource = new ClassPathResource("files/" + fileName);
-        InputStream inputStream = classPathResource.getInputStream();
-        InputStreamResource resource = new InputStreamResource(inputStream);
-
-        HttpHeaders headers = new HttpHeaders();
+    public void downloadTemplates(HttpServletResponse response) throws IOException {
+        String[] templateFileNames = {
+                "template1.docx",
+        };
+        InputStream[] ins = new InputStream[templateFileNames.length];
+        for (int i = 0; i < templateFileNames.length; i++) {
+            String templateFileName = templateFileNames[i];
+            ClassPathResource classPathResource = new ClassPathResource("files/" + templateFileName);
+            InputStream inputStream = classPathResource.getInputStream();
+            ins[i] = inputStream;
+        }
         ContentDisposition contentDisposition = ContentDisposition.builder("attachment")
-                .filename(fileName, StandardCharsets.UTF_8)
+                .filename("templates.zip", StandardCharsets.UTF_8)
                 .build();
-        headers.add("Content-Disposition", contentDisposition.toString());
-        headers.add("Cache-Control", "no-cache,no-store,must-revalidate");
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-
-        return ResponseEntity.ok().headers(headers).contentLength(inputStream.available())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
+        response.setHeader("Content-Disposition", contentDisposition.toString());
+        response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Expires", "0");
+        ZipUtil.zip(response.getOutputStream(), templateFileNames, ins);
     }
 
     @PostMapping("/generate")
     public void generate(@RequestParam MultipartFile[] swaggerFiles,
-                         @RequestParam(required = false) MultipartFile templateFile,
+                         @RequestParam MultipartFile templateFile,
                          @RequestParam String json, HttpServletResponse response) {
         DbdocConfigDTO param = JsonUtil.readValue(json, DbdocConfigDTO.class);
         GenerateResult result = documentService.generate(param, swaggerFiles, templateFile);

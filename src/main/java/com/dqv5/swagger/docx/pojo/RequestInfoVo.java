@@ -10,6 +10,7 @@ public class RequestInfoVo {
     private String number;
     private String requestUrl;
     private String requestMethod;
+    private String summary;
     private String description;
     private List<RequestParamVo> parameters;
 }

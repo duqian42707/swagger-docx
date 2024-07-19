@@ -1,7 +1,7 @@
 <nz-spin [nzSpinning]="loading">
   <form nz-form [formGroup]="validateForm" (ngSubmit)="submit()">
     <nz-form-item>
-      <nz-form-label [nzSpan]="6">Swagger文件</nz-form-label>
+      <nz-form-label [nzSpan]="6" nzRequired>Swagger文件</nz-form-label>
       <nz-form-control [nzSpan]="18" nzErrorTip="请上传swagger.json文件!">
         <nz-upload [nzAccept]="'.json'" [(nzFileList)]="swaggerFileList" [nzBeforeUpload]="beforeUpload1">
           <button type="button" nz-button><i nz-icon nzType="upload"></i><span>选择文件</span></button>
@@ -9,12 +9,11 @@
       </nz-form-control>
     </nz-form-item>
     <nz-form-item>
-      <nz-form-label [nzSpan]="6">自定义模板</nz-form-label>
-      <nz-form-control [nzSpan]="18" nzErrorTip="请输入描述!">
+      <nz-form-label [nzSpan]="6" nzRequired>Word模板</nz-form-label>
+      <nz-form-control [nzSpan]="18" nzErrorTip="请上传word模板文件!">
         <nz-upload [nzAccept]="'.docx'" [(nzFileList)]="templateFileList" [nzBeforeUpload]="beforeUpload2">
           <button type="button" nz-button><i nz-icon nzType="upload"></i><span>选择文件</span></button>
-          <button type="button" nz-button class="down-template-btn" (click)="downloadDefaultTemplate()">下载内置模板
-          </button>
+          <button type="button" nz-button nzType="link" (click)="downloadDefaultTemplate()">下载内置模板</button>
         </nz-upload>
       </nz-form-control>
     </nz-form-item>
