@@ -19,3 +19,4 @@ logging:
   level:
     root: info
     com.dqv5: debug
+    com.deepoove: warn
