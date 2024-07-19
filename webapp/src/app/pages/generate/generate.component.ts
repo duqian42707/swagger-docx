@@ -12,32 +12,31 @@ import {environment} from "../../../environments/environment";
   styleUrls: ['./generate.component.less']
 })
 export class GenerateComponent implements OnInit {
-  schemaList: string[] = [];
-  fileList: NzUploadFile[] = [];
+  swaggerFileList: NzUploadFile[] = [];
+  templateFileList: NzUploadFile[] = [];
 
   loading = false;
   validateForm: FormGroup;
-  uploadAccept = '.ftl';
 
 
   constructor(private http: HttpClient, private fb: FormBuilder) {
     this.validateForm = this.fb.group({
-      datasourceId: [null, [Validators.required]],
-      dbSchema: [null,],
-      tableNames: [[],],
       title: ['数据库表结构文档',],
       description: ['数据库表结构文档',],
       version: ['1.0.0',],
-      fileType: ['HTML',],
-      produceType: ['freemarker',],
     })
   }
 
   ngOnInit(): void {
   }
 
-  beforeUpload = (file: NzUploadFile): boolean => {
-    this.fileList = [file];
+  beforeUpload1 = (file: NzUploadFile): boolean => {
+    this.swaggerFileList = [...this.swaggerFileList, file];
+    return false;
+  };
+
+  beforeUpload2 = (file: NzUploadFile): boolean => {
+    this.templateFileList = [file];
     return false;
   };
 
@@ -50,8 +49,11 @@ export class GenerateComponent implements OnInit {
     const config = this.validateForm.getRawValue();
     const data = new FormData();
     data.append('json', JSON.stringify(config))
-    if (this.fileList.length > 0) {
-      data.append('template', this.fileList[0] as any);
+    for (const file of this.swaggerFileList) {
+      data.append('swaggerFiles', file as any);
+    }
+    if (this.templateFileList.length > 0) {
+      data.append('templateFile', this.templateFileList[0] as any);
     }
     this.loading = true;
 
