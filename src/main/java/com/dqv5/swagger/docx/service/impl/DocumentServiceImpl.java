@@ -9,6 +9,7 @@ import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
 import com.dqv5.swagger.docx.pojo.*;
 import com.dqv5.swagger.docx.service.DocumentService;
+import com.dqv5.swagger.docx.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -24,6 +25,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author duqian
@@ -39,41 +41,51 @@ public class DocumentServiceImpl implements DocumentService {
 
 
     @Override
-    public GenerateResult generate(DbdocConfigDTO config, MultipartFile[] swaggerFiles, MultipartFile template) {
+    public GenerateResult generate(String swaggerJson, MultipartFile template, String paramJson) {
         try {
-            log.info("config: {}", config);
-            log.info("template: {}", template);
+            GenerateParam generateParam = JsonUtil.readValue(paramJson, GenerateParam.class);
+            log.info("generateParam: {}", generateParam);
+
             String folderName = LocalDateTime.now().format(DATE_TIME_FORMATTER);
             String folderPath = AUTO_DIR + FILE_SEPARATOR + folderName;
             File folder = new File(folderPath);
             if (!folder.mkdirs()) {
                 throw new RuntimeException("创建临时目录失败:" + folderPath);
             }
+            File outputFile = new File(folderPath, "output.docx");
 
             DataModel model = new DataModel();
-            List<RequestInfoVo> requestInfos = new ArrayList<>();
-            for (MultipartFile swaggerFile : swaggerFiles) {
-                InputStream inputStream = swaggerFile.getInputStream();
-                String jsonStr = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                List<RequestInfoVo> requestInfoList = getRequestInfo(jsonStr);
-                requestInfos.addAll(requestInfoList);
-            }
+            List<RequestInfoVo> requestInfos = getRequestInfo(swaggerJson);
             model.setRequestInfos(requestInfos);
+
+            List<ModuleInfoVo> moduleInfos = generateParam.getModuleList().stream()
+                    .map(module -> {
+                        ModuleInfoVo moduleInfoVo = new ModuleInfoVo();
+                        List<String> apiIds = module.getApiIds();
+                        moduleInfoVo.setName(module.getName());
+                        moduleInfoVo.setDescription(module.getDescription());
+                        List<RequestInfoVo> requestInfoVos = requestInfos.stream().filter(x -> apiIds.contains(x.getId())).collect(Collectors.toList());
+                        moduleInfoVo.setRequestInfos(requestInfoVos);
+                        return moduleInfoVo;
+                    }).collect(Collectors.toList());
+            model.setModules(moduleInfos);
 
             //执行生成
             LoopRowTableRenderPolicy policy = new LoopRowTableRenderPolicy();
             Configure configure = Configure.builder().bind("requestInfos", policy).bind("parameters", policy)
                     .useSpringEL().build();
-            InputStream templateInputStream = template.getInputStream();
-            XWPFTemplate xwpfTemplate = XWPFTemplate.compile(templateInputStream, configure);
-
-            File file = new File(folderPath, "output.docx");
-            try (OutputStream out = Files.newOutputStream(file.toPath())) {
+            XWPFTemplate xwpfTemplate;
+            try (InputStream templateInputStream = template.getInputStream()) {
+                xwpfTemplate = XWPFTemplate.compile(templateInputStream, configure);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            try (OutputStream out = Files.newOutputStream(outputFile.toPath())) {
                 xwpfTemplate.render(model);
                 xwpfTemplate.writeAndClose(out);
             }
-            log.info("文档生成成功: {}", file);
-            return new GenerateResult(folderName, file);
+            log.info("文档生成成功: {}", outputFile);
+            return new GenerateResult(folderName, outputFile);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -106,13 +118,14 @@ public class DocumentServiceImpl implements DocumentService {
         Set<String> pathSet = paths.keySet();
         int i = 0;
         for (String path : pathSet) {
-            RequestInfoVo info = new RequestInfoVo();
-            info.setNumber((i + 1) + "");
-            i++;
             JSONObject infoJson = paths.getJSONObject(path);
-            info.setRequestUrl(path);
             Set<String> methodSet = infoJson.keySet();
             for (String method : methodSet) {
+                RequestInfoVo info = new RequestInfoVo();
+                info.setId(method + "-" + path);
+                info.setNumber((i + 1) + "");
+                i++;
+                info.setRequestUrl(path);
                 info.setRequestMethod(method);
                 JSONObject paramInfo = infoJson.getJSONObject(method);
                 String summary = paramInfo.getString("summary");
@@ -139,8 +152,8 @@ public class DocumentServiceImpl implements DocumentService {
                     }
                 }
                 info.setParameters(parameters);
+                requestList.add(info);
             }
-            requestList.add(info);
         }
         return requestList;
     }

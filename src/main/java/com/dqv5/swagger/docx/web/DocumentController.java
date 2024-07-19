@@ -1,17 +1,14 @@
 package com.dqv5.swagger.docx.web;
 
 import cn.hutool.core.util.ZipUtil;
-import com.dqv5.swagger.docx.pojo.DbdocConfigDTO;
+import com.dqv5.swagger.docx.pojo.GenerateParam;
 import com.dqv5.swagger.docx.pojo.GenerateResult;
 import com.dqv5.swagger.docx.service.DocumentService;
 import com.dqv5.swagger.docx.util.JsonUtil;
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,6 +36,8 @@ public class DocumentController {
     public void downloadTemplates(HttpServletResponse response) throws IOException {
         String[] templateFileNames = {
                 "template1.docx",
+                "template2.docx",
+                "template3.docx",
         };
         InputStream[] ins = new InputStream[templateFileNames.length];
         for (int i = 0; i < templateFileNames.length; i++) {
@@ -58,11 +57,10 @@ public class DocumentController {
     }
 
     @PostMapping("/generate")
-    public void generate(@RequestParam MultipartFile[] swaggerFiles,
+    public void generate(@RequestParam String swaggerJson,
                          @RequestParam MultipartFile templateFile,
-                         @RequestParam String json, HttpServletResponse response) {
-        DbdocConfigDTO param = JsonUtil.readValue(json, DbdocConfigDTO.class);
-        GenerateResult result = documentService.generate(param, swaggerFiles, templateFile);
+                         @RequestParam String paramJson, HttpServletResponse response) {
+        GenerateResult result = documentService.generate(swaggerJson, templateFile, paramJson);
         String folderName = result.getFolderName();
         File file = result.getFile();
 

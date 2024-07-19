@@ -2,6 +2,7 @@ package com.dqv5.swagger.docx.pojo;
 
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -10,5 +11,8 @@ import java.util.List;
  */
 @Data
 public class DataModel {
-    List<RequestInfoVo> requestInfos;
+    // 全部接口
+    private List<RequestInfoVo> requestInfos = new ArrayList<>();
+    // 按模块分组
+    private List<ModuleInfoVo> modules = new ArrayList<>();
 }

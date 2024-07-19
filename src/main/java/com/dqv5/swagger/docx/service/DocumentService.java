@@ -1,6 +1,6 @@
 package com.dqv5.swagger.docx.service;
 
-import com.dqv5.swagger.docx.pojo.DbdocConfigDTO;
+import com.dqv5.swagger.docx.pojo.GenerateParam;
 import com.dqv5.swagger.docx.pojo.GenerateResult;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,7 +15,7 @@ public interface DocumentService {
     /**
      * 生成文件并下载
      */
-    GenerateResult generate(DbdocConfigDTO param, MultipartFile[] swaggerFiles, MultipartFile templateFile);
+    GenerateResult generate(String swaggerJson, MultipartFile templateFile, String paramJson);
 
     void deleteTempFolder(String folderName);
 

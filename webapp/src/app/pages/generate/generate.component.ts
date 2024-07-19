@@ -6,6 +6,7 @@ import {NzUploadFile} from "ng-zorro-antd/upload";
 import {filter} from "rxjs";
 import {environment} from "../../../environments/environment";
 import {NzMessageService} from "ng-zorro-antd/message";
+import {readTextFile} from "../../utils/read-text";
 
 @Component({
   selector: 'app-generate',
@@ -22,9 +23,8 @@ export class GenerateComponent implements OnInit {
 
   constructor(private http: HttpClient, private fb: FormBuilder, private msg: NzMessageService) {
     this.validateForm = this.fb.group({
-      title: ['数据库表结构文档',],
-      description: ['数据库表结构文档',],
-      version: ['1.0.0',],
+      moduleList: [null,],
+      swaggerJson: [null]
     })
   }
 
@@ -32,7 +32,10 @@ export class GenerateComponent implements OnInit {
   }
 
   beforeUpload1 = (file: NzUploadFile): boolean => {
-    this.swaggerFileList = [...this.swaggerFileList, file];
+    this.swaggerFileList = [file];
+    readTextFile(file).then(res => {
+      this.validateForm.patchValue({swaggerJson: res})
+    })
     return false;
   };
 
@@ -47,9 +50,13 @@ export class GenerateComponent implements OnInit {
   }
 
   submit() {
-    const config = this.validateForm.getRawValue();
+    const formData = this.validateForm.getRawValue();
+    const generateParam = {
+      moduleList: eval(formData.moduleList)
+    }
     const data = new FormData();
-    data.append('json', JSON.stringify(config))
+    data.append('swaggerJson', formData.swaggerJson)
+    data.append('paramJson', JSON.stringify(generateParam))
     if (this.swaggerFileList.length == 0) {
       this.msg.warning('请上传Swagger Json文件！');
       return;

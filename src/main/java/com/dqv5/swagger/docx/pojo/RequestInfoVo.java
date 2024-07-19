@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class RequestInfoVo {
-
+    private String id;
     private String number;
     private String requestUrl;
     private String requestMethod;

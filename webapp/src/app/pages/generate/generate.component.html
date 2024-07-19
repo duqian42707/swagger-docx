@@ -1,26 +1,34 @@
-<nz-spin [nzSpinning]="loading">
-  <form nz-form [formGroup]="validateForm" (ngSubmit)="submit()">
-    <nz-form-item>
-      <nz-form-label [nzSpan]="6" nzRequired>Swagger文件</nz-form-label>
-      <nz-form-control [nzSpan]="18" nzErrorTip="请上传swagger.json文件!">
-        <nz-upload [nzAccept]="'.json'" [(nzFileList)]="swaggerFileList" [nzBeforeUpload]="beforeUpload1">
-          <button type="button" nz-button><i nz-icon nzType="upload"></i><span>选择文件</span></button>
-        </nz-upload>
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-label [nzSpan]="6" nzRequired>Word模板</nz-form-label>
-      <nz-form-control [nzSpan]="18" nzErrorTip="请上传word模板文件!">
-        <nz-upload [nzAccept]="'.docx'" [(nzFileList)]="templateFileList" [nzBeforeUpload]="beforeUpload2">
-          <button type="button" nz-button><i nz-icon nzType="upload"></i><span>选择文件</span></button>
-          <button type="button" nz-button nzType="link" (click)="downloadDefaultTemplate()">下载内置模板</button>
-        </nz-upload>
-      </nz-form-control>
-    </nz-form-item>
-    <nz-form-item>
-      <nz-form-control [nzSpan]="18" [nzOffset]="6">
-        <button nz-button nzType="primary" [disabled]="!validateForm.valid">生成</button>
-      </nz-form-control>
-    </nz-form-item>
-  </form>
-</nz-spin>
+<div class="generate-main">
+  <nz-spin [nzSpinning]="loading">
+    <form nz-form [formGroup]="validateForm" (ngSubmit)="submit()">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Swagger文件</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="请上传swagger.json文件!">
+          <nz-upload [nzAccept]="'.json'" [(nzFileList)]="swaggerFileList" [nzBeforeUpload]="beforeUpload1">
+            <button type="button" nz-button><i nz-icon nzType="upload"></i><span>选择文件</span></button>
+          </nz-upload>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>Word模板</nz-form-label>
+        <nz-form-control [nzSpan]="18" nzErrorTip="请上传word模板文件!">
+          <nz-upload [nzAccept]="'.docx'" [(nzFileList)]="templateFileList" [nzBeforeUpload]="beforeUpload2">
+            <button type="button" nz-button><i nz-icon nzType="upload"></i><span>选择文件</span></button>
+            <button type="button" nz-button nzType="link" (click)="downloadDefaultTemplate()">下载内置模板</button>
+          </nz-upload>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6">模块配置</nz-form-label>
+        <nz-form-control [nzSpan]="18">
+          <textarea nz-input rows="8" formControlName="moduleList"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-control [nzSpan]="18" [nzOffset]="6">
+          <button nz-button nzType="primary" [disabled]="!validateForm.valid">生成</button>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </nz-spin>
+</div>
