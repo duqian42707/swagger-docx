@@ -1,5 +1,5 @@
 # swagger-docx
-根据swagger.json文件，生成详细设计文档中的接口设计部分。
+根据swagger.json文件，生成概要设计、详细设计文档中的接口设计部分。
 
 功能：
 
