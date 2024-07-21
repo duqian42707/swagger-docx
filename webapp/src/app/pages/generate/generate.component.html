@@ -4,9 +4,13 @@
       <nz-form-item>
         <nz-form-label [nzSpan]="6" nzRequired>Swagger文件</nz-form-label>
         <nz-form-control [nzSpan]="18" nzErrorTip="请上传swagger.json文件!">
-          <nz-upload [nzAccept]="'.json'" [(nzFileList)]="swaggerFileList" [nzBeforeUpload]="beforeUpload1">
-            <button type="button" nz-button><i nz-icon nzType="upload"></i><span>选择文件</span></button>
-          </nz-upload>
+          <app-swagger-file-config formControlName="swaggerJsons"></app-swagger-file-config>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6" nzRequired>模块接口配置</nz-form-label>
+        <nz-form-control [nzSpan]="18">
+          <app-module-api-config [swaggerJsons]="validateForm.value['swaggerJsons']"  formControlName="moduleApis"></app-module-api-config>
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>
@@ -16,12 +20,6 @@
             <button type="button" nz-button><i nz-icon nzType="upload"></i><span>选择文件</span></button>
             <button type="button" nz-button nzType="link" (click)="downloadDefaultTemplate()">下载内置模板</button>
           </nz-upload>
-        </nz-form-control>
-      </nz-form-item>
-      <nz-form-item>
-        <nz-form-label [nzSpan]="6">模块配置</nz-form-label>
-        <nz-form-control [nzSpan]="18">
-          <textarea nz-input rows="8" formControlName="moduleList"></textarea>
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>

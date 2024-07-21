@@ -16,6 +16,9 @@ import {NzTableModule} from "ng-zorro-antd/table";
 import {NzMessageModule} from "ng-zorro-antd/message";
 import {DocsComponent} from './docs/docs.component';
 import {MarkdownModule} from "ngx-markdown";
+import {SwaggerFileConfigModule} from "../common/swagger-file-config/swagger-file-config.module";
+import {ModuleApiConfigModule} from "../common/module-api-config/module-api-config.module";
+import {NzIconModule} from "ng-zorro-antd/icon";
 
 
 @NgModule({
@@ -36,7 +39,10 @@ import {MarkdownModule} from "ngx-markdown";
     NzPopconfirmModule,
     NzTableModule,
     NzMessageModule,
-    MarkdownModule.forRoot()
+    MarkdownModule.forRoot(),
+    SwaggerFileConfigModule,
+    ModuleApiConfigModule,
+    NzIconModule
   ]
 })
 export class PagesModule {

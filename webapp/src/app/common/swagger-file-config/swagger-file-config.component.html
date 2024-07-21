@@ -1,0 +1,4 @@
+<nz-upload [nzAccept]="'.json'" [(nzFileList)]="swaggerFileList" [nzBeforeUpload]="beforeUpload"
+           [nzDisabled]="disabled" (nzChange)="fileListChange($event)">
+  <button type="button" nz-button><i nz-icon nzType="upload"></i><span>选择文件</span></button>
+</nz-upload>

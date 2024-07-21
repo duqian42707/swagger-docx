@@ -1,0 +1,20 @@
+<div>
+  <button nz-button type="button" (click)="openConfigModal()">
+    <i nz-icon nzType="setting"></i><span>开始配置</span>
+  </button>
+  <span style="margin-left: 5px">共x个模块，x个接口</span>
+</div>
+
+<ng-template #modalContentTpl>
+  <div nz-row>
+    <div nz-col [nzSpan]="8">
+      <app-module-management></app-module-management>
+    </div>
+    <div nz-col [nzSpan]="8">
+      <nz-tree #nzTreeComponent nzCheckable [nzData]="treeData"></nz-tree>
+    </div>
+    <div nz-col [nzSpan]="8">
+      sss
+    </div>
+  </div>
+</ng-template>
